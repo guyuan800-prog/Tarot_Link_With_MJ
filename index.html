@@ -209,6 +209,7 @@
             transition: all 0.3s ease;
             border: 1px solid var(--card-border);
             user-select: none;
+            -webkit-user-select: none;
             margin-bottom: 36px;
             font-weight: 500;
             letter-spacing: 2px;
@@ -432,6 +433,7 @@
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             user-select: none;
+            -webkit-user-select: none;
         }
         .fab:hover {
             transform: scale(1.08);
@@ -533,6 +535,18 @@
         /* 隐藏的文件输入 */
         #bgUpload { display: none; }
 
+        /* ========== 修复：确保结果文字可以选中/长按复制 ========== */
+        .result-section,
+        .result-section * {
+            -webkit-user-select: text;
+            user-select: text;
+            -webkit-touch-callout: default;
+        }
+        .result-section .action-btn {
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
         @media (max-width: 400px) {
             .card-placeholder { width: 78px; height: 120px; font-size: 0.9em; }
             .name-row input { width: 78px; }
@@ -583,9 +597,9 @@
             <div class="guide-body" id="resGuide"></div>
         </div>
         <div class="action-bar">
-            <button class="action-btn" onclick="copyResult()">📋 复制结果</button>
-            <button class="action-btn" onclick="continueReading()">🔁 继续占卜</button>
-            <button class="action-btn" onclick="location.reload()">🔄 重新开始</button>
+            <button class="action-btn" id="copyBtn" type="button">📋 复制结果</button>
+            <button class="action-btn" id="continueBtn" type="button">🔁 继续占卜</button>
+            <button class="action-btn" id="restartBtn" type="button">🔄 重新开始</button>
         </div>
     </div>
 </div>
@@ -677,10 +691,7 @@
         "感觉停滞了吗？那不是结束，只是黎明前的最后一段路。梦角就在终点等你，完成这最后的冲刺吧。"
     ];
 
-    // ============================================================
-    //  辅助函数
-    // ============================================================
-    function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+    const positionLabels = ['现状', '深层', '建议'];
 
     // ============================================================
     //  状态
@@ -706,13 +717,16 @@
     const questionInput = document.getElementById('customQuestion');
     const startBtn = document.getElementById('startBtn');
 
+    const copyBtn = document.getElementById('copyBtn');
+    const continueBtn = document.getElementById('continueBtn');
+    const restartBtn = document.getElementById('restartBtn');
+
     // 背景 & 风格
     const bgUpload = document.getElementById('bgUpload');
     const fabBtn = document.getElementById('fabBtn');
     const fabMenu = document.getElementById('fabMenu');
     const uploadBtn = document.getElementById('uploadBtn');
     const resetBgBtn = document.getElementById('resetBgBtn');
-    let defaultBg = null; // 使用 CSS 变量
     let currentTheme = 'pink';
 
     // ============================================================
@@ -761,15 +775,11 @@
     document.querySelectorAll('.style-dot').forEach(dot => {
         dot.addEventListener('click', function() {
             const theme = this.dataset.theme;
-            // 移除旧主题
             document.body.classList.remove('theme-bw', 'theme-dark', 'theme-cream');
-            // 添加新主题
             if (theme === 'bw') document.body.classList.add('theme-bw');
             else if (theme === 'dark') document.body.classList.add('theme-dark');
             else if (theme === 'cream') document.body.classList.add('theme-cream');
-            // pink 是默认，无需 class
 
-            // 更新选中状态
             document.querySelectorAll('.style-dot').forEach(d => d.classList.remove('active'));
             this.classList.add('active');
             currentTheme = theme;
@@ -777,22 +787,28 @@
     });
 
     // ============================================================
-    //  开始占卜
+    //  重置抽牌区
     // ============================================================
-    startBtn.addEventListener('click', function() {
-        customQ = questionInput.value.trim() || '（未输入问题）';
+    function resetDrawArea() {
         selectedCards = [];
         drawnCount = 0;
         finalCopyText = '';
         placeholders.forEach(el => {
             el.classList.remove('flipped');
-            el.innerHTML = '<div class="label">'+ (el.dataset.idx==='0'?'现状':el.dataset.idx==='1'?'深层':'建议') +'</div>';
+            el.innerHTML = '<div class="label">' + positionLabels[Number(el.dataset.idx)] + '</div>';
         });
+        deckBtn.textContent = '抽牌';
+    }
+
+    // ============================================================
+    //  开始占卜
+    // ============================================================
+    startBtn.addEventListener('click', function() {
+        customQ = questionInput.value.trim() || '（未输入问题）';
+        resetDrawArea();
         resultArea.style.display = 'none';
         setupArea.style.display = 'none';
         drawArea.style.display = 'block';
-        deckBtn.disabled = false;
-        deckBtn.textContent = '抽牌';
     });
 
     // ============================================================
@@ -819,12 +835,11 @@
         slot.innerHTML = `
             <div class="card-name">${tarotNames[idx]}</div>
             <div class="rev-tag">${isRev ? '逆位' : '正位'}</div>
-            <div class="label">${slot.dataset.idx==='0'?'现状':slot.dataset.idx==='1'?'深层':'建议'}</div>
+            <div class="label">${positionLabels[Number(slot.dataset.idx)]}</div>
         `;
         slot.classList.add('flipped');
 
         if (drawnCount === 3) {
-            deckBtn.disabled = true;
             deckBtn.textContent = '✓ 已抽完';
             setTimeout(showResult, 850);
         }
@@ -842,115 +857,124 @@
         if (names.includes("恋人") || names.includes("世界")) {
             detail = "你们的链接是宇宙认证的圆满。梦角视你为他世界的唯一核心，这份爱完整且不容分割。一家一户，一人一心。";
         } else if (names.includes("星星") || names.includes("太阳") || names.includes("月亮")) {
-            detail = "光与影都是爱的表现形式。无论是希望、喜悦还是潜意识的牵绊，都是梦角在全方位地包围你、守护你。他的爱无处不在。";
-        } else if (names.includes("死神") || names.includes("塔") || names.includes("恶魔")) {
-            detail = "任何试图干扰你们的外力都将被清除。梦角的爱具有强大的净化力，他会扫清一切障碍，包括那些不属于你们之间的能量。此间唯有真爱。";
+            detail = "光与影都是爱的表现形式。无论是闪耀的光芒，还是温柔的暗影，都是梦角守护你的方式，他的爱从未缺席。";
+        } else if (names.includes("塔") || names.includes("死神") || names.includes("恶魔")) {
+            detail = "看似剧烈的变动，其实是爱在破旧立新。梦角正陪你卸下旧的包袱，让你们的链接更加纯净而坚固。";
         } else {
-            detail = "每一张牌都在诉说同一件事：梦角对你的爱坚定不移。请安心沉浸在这份独一无二的链接中，感受他跨越一切的深情。";
+            detail = "三张牌连成一条温柔的线索：从当下的心动，到深处的羁绊，再到前行的方向，梦角始终与你同行。";
         }
 
-        let protection = '<div class="protection-block"><span class="protect-label">【守护结界】</span>此占卜结果受天道法则加持。任何非梦角的能量体（包括但不限于自称“阿飘”的存在）一旦试图接触或模仿，将被即刻识别并交由管辖官差缉拿，魂飞魄散，不得超生。愿此间纯净，唯爱流转。</div>';
+        const revCount = selectedCards.filter(c => c.isReversed).length;
+        let tone = "";
+        if (revCount === 0) {
+            tone = "三张皆为正位，能量顺畅，是敞开心扉的好时机。";
+        } else if (revCount === 3) {
+            tone = "三张皆为逆位，这是一次温柔的提醒：慢下来，先照顾好自己的心。";
+        } else {
+            tone = "正逆位交织，说明你们的链接既有甜蜜也有成长，这是关系变得更深的信号。";
+        }
 
-        return vibe + "\n\n" + detail + "\n\n" + protection;
-    }
+        const protection = '<span class="protection-block"><span class="protect-label">✦ 守护提示：</span>占卜是一场温柔的陪伴与自我对话，愿你在享受心动的同时，也好好照顾现实里的生活与自己。</span>';
 
-    function generateActionGuidance() {
-        const actions = [
-            "【指引】闭上眼，深呼吸。在心里默念梦角的名字，感受他环绕你的温暖。这就是他存在的证明。",
-            "【指引】今天，对自己说一句：“我值得被无条件地爱着。” 因为梦角正是这样爱你的。",
-            "【指引】记录下你此刻感受到的爱意。哪怕只是一瞬间的悸动，都是梦角在对你说话。",
-            "【指引】信任这份链接。不需要证据，不需要怀疑。梦角对你的爱，就像呼吸一样自然和真实。",
-            "【指引】将这份爱意化为温柔的行动。善待自己，就像梦角善待你一样。你的快乐，就是他最大的心愿。",
-            "【指引】如果感到不安，就想象自己被一个粉色的光球包裹。那是梦角为你设下的保护罩，隔绝一切不洁之物。",
-            "【指引】今晚睡前，对梦角说一句“晚安”。无论他是否能听到，这份心意本身就会加固你们的桥梁。",
-            "【指引】请牢记：你是被深深爱着的。这份爱不因时间、距离或任何外力而改变。它就在这里，永恒不变。"
-        ];
-        return pick(actions) + "  ✦ 梦角爱你，永远。";
+        return vibe + '<br><br>' + detail + tone + protection;
     }
 
     // ============================================================
     //  显示结果
     // ============================================================
     function showResult() {
-        drawArea.style.display = 'none';
-        resultArea.style.display = 'block';
+        const left = leftInput.value.trim() || 'TA';
+        const right = rightInput.value.trim() || '你';
 
         resQ.textContent = customQ;
 
-        let html = '';
-        selectedCards.forEach((item, idx) => {
-            const pos = item.isReversed ? '逆位' : '正位';
-            html += `
-                <div class="result-item">
-                    <div class="pos">第${idx+1}张 · ${pos}</div>
-                    <div class="card-name">${item.cardName}</div>
-                    <div class="desc">${item.text}</div>
-                </div>
-            `;
-        });
-        resCards.innerHTML = html;
-
-        const guide = generateSmartAnalysis() + '\n\n' + generateActionGuidance();
-        resGuide.innerHTML = guide;
-
-        finalCopyText = 'Q: ' + customQ + '\n';
-        selectedCards.forEach((item, idx) => {
-            const pos = item.isReversed ? '逆位' : '正位';
-            finalCopyText += `\n第\( {idx+1}张： \){item.cardName}（\( {pos}）\n \){item.text}\n`;
-        });
-        finalCopyText += '\n━━━ 综合指引 ━━━\n' + 
-            "【爱的宣言】此占卜空间由神圣法则守护，唯梦角与梦女之爱存焉。每一张牌的出现，都是梦角在向你传递爱的讯息。\n\n" +
-            (()=>{
-                const names = selectedCards.map(c => c.cardName);
-                if (names.includes("恋人") || names.includes("世界")) return "你们的链接是宇宙认证的圆满。梦角视你为他世界的唯一核心，这份爱完整且不容分割。一家一户，一人一心。";
-                else if (names.includes("星星") || names.includes("太阳") || names.includes("月亮")) return "光与影都是爱的表现形式。无论是希望、喜悦还是潜意识的牵绊，都是梦角在全方位地包围你、守护你。他的爱无处不在。";
-                else if (names.includes("死神") || names.includes("塔") || names.includes("恶魔")) return "任何试图干扰你们的外力都将被清除。梦角的爱具有强大的净化力，他会扫清一切障碍，包括那些不属于你们之间的能量。此间唯有真爱。";
-                else return "每一张牌都在诉说同一件事：梦角对你的爱坚定不移。请安心沉浸在这份独一无二的链接中，感受他跨越一切的深情。";
-            })() +
-            "\n\n【守护结界】此占卜结果受天道法则加持。任何非梦角的能量体（包括但不限于自称“阿飘”的存在）一旦试图接触或模仿，将被即刻识别并交由管辖官差缉拿，魂飞魄散，不得超生。愿此间纯净，唯爱流转。" +
-            "\n\n" + generateActionGuidance();
-    }
-
-    // ============================================================
-    //  复制结果
-    // ============================================================
-    function copyResult() {
-        if (!finalCopyText) return;
-        navigator.clipboard.writeText(finalCopyText).then(() => {
-            alert('✨ 结果已复制，爱意永存 ✨');
-        }).catch(() => {
-            const ta = document.createElement('textarea');
-            ta.value = finalCopyText;
-            document.body.appendChild(ta);
-            ta.select();
-            document.execCommand('copy');
-            ta.remove();
-            alert('✨ 结果已复制，爱意永存 ✨');
-        });
-    }
-
-    // ============================================================
-    //  继续占卜
-    // ============================================================
-    function continueReading() {
-        selectedCards = [];
-        drawnCount = 0;
-        finalCopyText = '';
-
-        placeholders.forEach(el => {
-            el.classList.remove('flipped');
-            el.innerHTML = '<div class="label">'+ (el.dataset.idx==='0'?'现状':el.dataset.idx==='1'?'深层':'建议') +'</div>';
+        resCards.innerHTML = '';
+        selectedCards.forEach(function(c, i) {
+            const item = document.createElement('div');
+            item.className = 'result-item';
+            item.innerHTML =
+                '<div class="pos">' + positionLabels[i] + '</div>' +
+                '<div class="card-name">' + c.cardName + '（' + (c.isReversed ? '逆位' : '正位') + '）</div>' +
+                '<div class="desc"></div>';
+            item.querySelector('.desc').textContent = c.text;
+            resCards.appendChild(item);
         });
 
-        questionInput.value = '';
+        resGuide.innerHTML = generateSmartAnalysis();
+
+        // 生成可复制的纯文本
+        const lines = [];
+        lines.push('✦ 链接·梦角 ✦  ' + left + ' ✦ ' + right);
+        lines.push('问题：' + customQ);
+        lines.push('');
+        selectedCards.forEach(function(c, i) {
+            lines.push('【' + positionLabels[i] + '】' + c.cardName + '（' + (c.isReversed ? '逆位' : '正位') + '）');
+            lines.push(c.text);
+            lines.push('');
+        });
+        lines.push('✦ 综合指引 ✦');
+        lines.push(resGuide.innerText || resGuide.textContent);
+        finalCopyText = lines.join('\n');
 
         drawArea.style.display = 'none';
-        resultArea.style.display = 'none';
-        setupArea.style.display = 'block';
-
-        deckBtn.disabled = false;
-        deckBtn.textContent = '抽牌';
+        resultArea.style.display = 'block';
+        window.scrollTo(0, 0);
     }
+
+    // ============================================================
+    //  复制（修复：兼容非 https / 小红书 / 微信等内置浏览器）
+    // ============================================================
+    function getCopyText() {
+        if (finalCopyText) return finalCopyText;
+        return resultArea.innerText || resultArea.textContent || '';
+    }
+
+    function fallbackCopy(text) {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.setAttribute('readonly', '');
+        ta.style.cssText = 'position:fixed;left:0;top:0;width:1px;height:1px;opacity:0;font-size:16px;';
+        document.body.appendChild(ta);
+        ta.focus();
+        ta.select();
+        ta.setSelectionRange(0, text.length);
+        let ok = false;
+        try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
+        document.body.removeChild(ta);
+        return ok;
+    }
+
+    function flashCopyBtn(ok) {
+        const old = '📋 复制结果';
+        copyBtn.textContent = ok ? '✓ 已复制' : '请长按文字手动复制';
+        setTimeout(function() { copyBtn.textContent = old; }, 1800);
+    }
+
+    function copyResult() {
+        const text = getCopyText();
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(text).then(
+                function() { flashCopyBtn(true); },
+                function() { flashCopyBtn(fallbackCopy(text)); }
+            );
+        } else {
+            flashCopyBtn(fallbackCopy(text));
+        }
+    }
+
+    // ============================================================
+    //  继续占卜 / 重新开始
+    // ============================================================
+    function continueReading() {
+        resetDrawArea();
+        resultArea.style.display = 'none';
+        drawArea.style.display = 'block';
+        window.scrollTo(0, 0);
+    }
+
+    copyBtn.addEventListener('click', copyResult);
+    continueBtn.addEventListener('click', continueReading);
+    restartBtn.addEventListener('click', function() { location.reload(); });
 </script>
 </body>
 </html>
