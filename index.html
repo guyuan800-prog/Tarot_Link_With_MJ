@@ -1,980 +1,197 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>链接·梦角 · 专属占卜</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        :root {
-            --bg: linear-gradient(160deg, #fdf6f6 0%, #f8e9ec 45%, #fdeef2 100%);
-            --text: #4a3f42;
-            --text-soft: #9a858b;
-            --card-bg: rgba(255, 252, 251, 0.92);
-            --card-border: rgba(255, 220, 225, 0.45);
-            --accent: #c48b96;
-            --accent-soft: #e8c5cb;
-            --btn-bg: linear-gradient(135deg, #c48b96, #d4a5ae);
-            --btn-text: #fff;
-            --input-bg: rgba(255, 255, 255, 0.7);
-            --input-border: #f0dce0;
-            --shadow: 0 8px 32px rgba(180, 120, 130, 0.08);
-            --card-shadow: 0 4px 20px rgba(180, 120, 130, 0.06);
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', sans-serif;
-            min-height: 100vh;
-            background: var(--bg);
-            background-attachment: fixed;
-            padding: 28px 18px 100px;
-            color: var(--text);
-            transition: background 0.5s ease, color 0.4s ease;
-            line-height: 1.65;
-            -webkit-font-smoothing: antialiased;
-        }
-
-        /* ========== 主题 ========== */
-        body.theme-bw {
-            --bg: linear-gradient(160deg, #f7f7f7 0%, #efefef 50%, #f5f5f5 100%);
-            --text: #2c2c2c;
-            --text-soft: #8a8a8a;
-            --card-bg: rgba(255, 255, 255, 0.95);
-            --card-border: rgba(0, 0, 0, 0.06);
-            --accent: #555;
-            --accent-soft: #bbb;
-            --btn-bg: linear-gradient(135deg, #3a3a3a, #555);
-            --btn-text: #fff;
-            --input-bg: rgba(255, 255, 255, 0.9);
-            --input-border: #e0e0e0;
-            --shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
-            --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
-        }
-
-        body.theme-dark {
-            --bg: linear-gradient(160deg, #1a1618 0%, #221c1f 50%, #1e191b 100%);
-            --text: #f0e6e8;
-            --text-soft: #b8a5aa;
-            --card-bg: rgba(40, 32, 35, 0.88);
-            --card-border: rgba(180, 130, 140, 0.2);
-            --accent: #d4a0ab;
-            --accent-soft: #8a6a72;
-            --btn-bg: linear-gradient(135deg, #c48b96, #a8727d);
-            --btn-text: #fff;
-            --input-bg: rgba(50, 40, 44, 0.7);
-            --input-border: #6a5058;
-            --shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
-            --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
-        }
-
-        body.theme-cream {
-            --bg: linear-gradient(160deg, #faf6f0 0%, #f5eee4 50%, #f8f1e8 100%);
-            --text: #4a433c;
-            --text-soft: #9a8f84;
-            --card-bg: rgba(255, 252, 247, 0.94);
-            --card-border: rgba(220, 200, 180, 0.35);
-            --accent: #c4a882;
-            --accent-soft: #e0d0b8;
-            --btn-bg: linear-gradient(135deg, #c4a882, #d4bc9a);
-            --btn-text: #fff;
-            --input-bg: rgba(255, 252, 247, 0.8);
-            --input-border: #e8dcc8;
-            --shadow: 0 8px 32px rgba(160, 130, 100, 0.08);
-            --card-shadow: 0 4px 20px rgba(160, 130, 100, 0.06);
-        }
-
-        .container { max-width: 420px; margin: 0 auto; }
-
-        /* header - 极简 */
-        .header {
-            text-align: center;
-            margin-bottom: 36px;
-            padding-top: 12px;
-        }
-        .header h1 {
-            font-size: 1.65em;
-            letter-spacing: 8px;
-            color: var(--accent);
-            font-weight: 300;
-            margin-bottom: 4px;
-        }
-        .header p {
-            color: var(--text-soft);
-            font-size: 0.72em;
-            letter-spacing: 3px;
-            font-weight: 400;
-        }
-
-        /* 设置区 */
-        .setup-card {
-            background: var(--card-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: 28px;
-            padding: 36px 28px 40px;
-            box-shadow: var(--shadow);
-            border: 1px solid var(--card-border);
-            transition: all 0.4s ease;
-        }
-
-        .name-row {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 16px;
-            margin-bottom: 28px;
-        }
-        .name-row input {
-            border: none;
-            border-bottom: 1px solid var(--input-border);
-            background: transparent;
-            text-align: center;
-            padding: 8px 4px;
-            font-size: 1em;
-            width: 90px;
-            outline: none;
-            color: var(--text);
-            font-family: inherit;
-            transition: border-color 0.3s ease;
-        }
-        .name-row input:focus { border-bottom-color: var(--accent); }
-        .name-row span {
-            color: var(--accent-soft);
-            font-size: 1em;
-            opacity: 0.8;
-        }
-
-        .q-input {
-            width: 100%;
-            padding: 14px 20px;
-            border: 1px solid var(--input-border);
-            border-radius: 50px;
-            background: var(--input-bg);
-            font-size: 0.95em;
-            text-align: center;
-            outline: none;
-            transition: all 0.3s ease;
-            margin-bottom: 28px;
-            font-family: inherit;
-            color: var(--text);
-        }
-        .q-input:focus {
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(196, 139, 150, 0.12);
-        }
-        .q-input::placeholder { color: var(--text-soft); opacity: 0.7; }
-
-        .btn-primary {
-            display: block;
-            width: 100%;
-            max-width: 200px;
-            margin: 0 auto;
-            padding: 14px 20px;
-            background: var(--btn-bg);
-            color: var(--btn-text);
-            border: none;
-            border-radius: 50px;
-            font-size: 0.95em;
-            letter-spacing: 3px;
-            cursor: pointer;
-            box-shadow: 0 6px 20px rgba(196, 139, 150, 0.22);
-            transition: all 0.3s ease;
-            font-family: inherit;
-            font-weight: 500;
-        }
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 28px rgba(196, 139, 150, 0.28);
-        }
-        .btn-primary:active { transform: scale(0.97); }
-
-        /* 抽牌区 */
-        .draw-section { display: none; text-align: center; }
-        .draw-hint {
-            color: var(--text-soft);
-            margin-bottom: 24px;
-            font-size: 0.88em;
-            letter-spacing: 2px;
-        }
-        .deck-btn {
-            display: inline-block;
-            padding: 16px 42px;
-            background: var(--card-bg);
-            border-radius: 50px;
-            color: var(--accent);
-            font-size: 1.1em;
-            cursor: pointer;
-            box-shadow: var(--card-shadow);
-            transition: all 0.3s ease;
-            border: 1px solid var(--card-border);
-            user-select: none;
-            -webkit-user-select: none;
-            margin-bottom: 36px;
-            font-weight: 500;
-            letter-spacing: 2px;
-        }
-        .deck-btn:hover {
-            transform: scale(1.03);
-            box-shadow: 0 8px 24px rgba(180, 120, 130, 0.12);
-        }
-        .deck-btn:active { transform: scale(0.96); }
-
-        .cards-row {
-            display: flex;
-            justify-content: center;
-            gap: 14px;
-            flex-wrap: wrap;
-            min-height: 160px;
-        }
-        .card-placeholder {
-            width: 88px;
-            height: 136px;
-            background: var(--card-bg);
-            border-radius: 14px;
-            border: 1px solid var(--card-border);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            font-size: 1em;
-            color: var(--text-soft);
-            transition: all 0.5s cubic-bezier(0.34, 1.4, 0.64, 1);
-            position: relative;
-            padding: 8px;
-            text-align: center;
-            box-shadow: var(--card-shadow);
-        }
-        .card-placeholder.flipped {
-            background: var(--card-bg);
-            border-color: var(--accent-soft);
-            color: var(--text);
-            box-shadow: 0 10px 28px rgba(180, 120, 130, 0.15);
-            transform: translateY(-6px);
-        }
-        .card-placeholder .card-name {
-            font-size: 0.9em;
-            font-weight: 600;
-            color: var(--text);
-            margin-bottom: 4px;
-            letter-spacing: 0.5px;
-        }
-        .card-placeholder .rev-tag {
-            font-size: 0.65em;
-            color: var(--accent);
-            background: rgba(196, 139, 150, 0.12);
-            padding: 2px 9px;
-            border-radius: 20px;
-            letter-spacing: 1px;
-        }
-        .card-placeholder .label {
-            font-size: 0.62em;
-            color: var(--text-soft);
-            margin-top: 6px;
-            letter-spacing: 1.5px;
-        }
-
-        /* 结果区 */
-        .result-section {
-            display: none;
-            animation: fadeUp 0.65s cubic-bezier(0.22, 1, 0.36, 1);
-        }
-        @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .result-header {
-            background: var(--card-bg);
-            backdrop-filter: blur(16px);
-            border-radius: 22px;
-            padding: 22px 20px;
-            margin-bottom: 18px;
-            text-align: center;
-            border: 1px solid var(--card-border);
-            box-shadow: var(--card-shadow);
-        }
-        .result-header .q-label {
-            font-size: 0.65em;
-            color: var(--text-soft);
-            letter-spacing: 3px;
-            font-weight: 500;
-        }
-        .result-header .q-text {
-            font-size: 1.05em;
-            color: var(--text);
-            font-weight: 600;
-            margin-top: 6px;
-            word-break: break-word;
-            line-height: 1.5;
-        }
-
-        .result-cards {
-            background: var(--card-bg);
-            backdrop-filter: blur(16px);
-            border-radius: 22px;
-            padding: 20px 18px 12px;
-            margin-bottom: 18px;
-            border: 1px solid var(--card-border);
-            box-shadow: var(--card-shadow);
-        }
-        .result-item {
-            margin-bottom: 20px;
-            padding-bottom: 16px;
-            border-bottom: 1px solid var(--card-border);
-        }
-        .result-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
-        .result-item .pos {
-            font-size: 0.65em;
-            color: var(--text-soft);
-            letter-spacing: 1.5px;
-            font-weight: 500;
-        }
-        .result-item .card-name {
-            font-size: 1.05em;
-            font-weight: 650;
-            color: var(--text);
-            margin: 4px 0 8px;
-            letter-spacing: 0.5px;
-        }
-        .result-item .desc {
-            font-size: 0.9em;
-            color: var(--text);
-            opacity: 0.88;
-            line-height: 1.75;
-            text-align: justify;
-        }
-
-        .final-guide {
-            background: var(--card-bg);
-            backdrop-filter: blur(16px);
-            border-radius: 22px;
-            padding: 24px 20px;
-            margin-bottom: 22px;
-            border: 1px solid var(--card-border);
-            box-shadow: var(--card-shadow);
-        }
-        .final-guide .guide-title {
-            text-align: center;
-            color: var(--accent);
-            letter-spacing: 4px;
-            margin-bottom: 14px;
-            font-weight: 600;
-            font-size: 0.88em;
-        }
-        .final-guide .guide-body {
-            font-size: 0.9em;
-            color: var(--text);
-            opacity: 0.9;
-            line-height: 1.85;
-            text-align: justify;
-            word-break: break-word;
-        }
-        .protection-block {
-            display: block;
-            margin-top: 14px;
-            padding: 12px 16px;
-            background: rgba(196, 139, 150, 0.08);
-            border-left: 3px solid var(--accent);
-            border-radius: 10px;
-            line-height: 1.75;
-        }
-        .protection-block .protect-label {
-            color: var(--accent);
-            font-weight: 650;
-            letter-spacing: 1px;
-        }
-
-        .action-bar {
-            display: flex;
-            justify-content: center;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
-        .action-btn {
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            padding: 10px 24px;
-            border-radius: 40px;
-            color: var(--text-soft);
-            cursor: pointer;
-            font-size: 0.82em;
-            transition: all 0.25s ease;
-            font-family: inherit;
-            letter-spacing: 0.5px;
-            box-shadow: var(--card-shadow);
-        }
-        .action-btn:hover {
-            border-color: var(--accent-soft);
-            color: var(--accent);
-            transform: translateY(-1px);
-        }
-
-        /* ========== 右下角 ☆ 浮动按钮 ========== */
-        .fab-wrap {
-            position: fixed;
-            right: 22px;
-            bottom: 28px;
-            z-index: 100;
-        }
-        .fab {
-            width: 52px;
-            height: 52px;
-            border-radius: 50%;
-            background: var(--card-bg);
-            border: 1px solid var(--card-border);
-            box-shadow: 0 6px 24px rgba(0, 0, 0, 0.1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.35em;
-            color: var(--accent);
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.34, 1.4, 0.64, 1);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            user-select: none;
-            -webkit-user-select: none;
-        }
-        .fab:hover {
-            transform: scale(1.08);
-            box-shadow: 0 8px 28px rgba(0, 0, 0, 0.14);
-        }
-        .fab.active {
-            transform: rotate(90deg) scale(1.05);
-            background: var(--accent);
-            color: #fff;
-            border-color: transparent;
-        }
-
-        /* 弹出菜单 */
-        .fab-menu {
-            position: absolute;
-            bottom: 64px;
-            right: 0;
-            width: 168px;
-            background: var(--card-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-radius: 18px;
-            border: 1px solid var(--card-border);
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
-            padding: 8px;
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(12px) scale(0.95);
-            transition: all 0.28s cubic-bezier(0.22, 1, 0.36, 1);
-            pointer-events: none;
-        }
-        .fab-menu.show {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0) scale(1);
-            pointer-events: auto;
-        }
-        .fab-menu-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 11px 14px;
-            border-radius: 12px;
-            font-size: 0.86em;
-            color: var(--text);
-            cursor: pointer;
-            transition: background 0.2s ease;
-            border: none;
-            background: none;
-            width: 100%;
-            text-align: left;
-            font-family: inherit;
-        }
-        .fab-menu-item:hover {
-            background: rgba(196, 139, 150, 0.1);
-        }
-        .fab-menu-item .icon {
-            font-size: 1.05em;
-            width: 20px;
-            text-align: center;
-            opacity: 0.85;
-        }
-        .fab-menu-divider {
-            height: 1px;
-            background: var(--card-border);
-            margin: 6px 8px;
-        }
-        .style-label {
-            font-size: 0.72em;
-            color: var(--text-soft);
-            padding: 6px 14px 4px;
-            letter-spacing: 1px;
-        }
-        .style-options {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            padding: 4px 10px 10px;
-        }
-        .style-dot {
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            border: 2px solid transparent;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            position: relative;
-        }
-        .style-dot:hover { transform: scale(1.12); }
-        .style-dot.active {
-            border-color: var(--accent);
-            box-shadow: 0 0 0 2px rgba(196, 139, 150, 0.25);
-        }
-        .style-dot.pink { background: linear-gradient(135deg, #f8e9ec, #e8c5cb); }
-        .style-dot.bw { background: linear-gradient(135deg, #f0f0f0, #555); }
-        .style-dot.dark { background: linear-gradient(135deg, #2a2225, #c48b96); }
-        .style-dot.cream { background: linear-gradient(135deg, #f5eee4, #c4a882); }
-
-        /* 隐藏的文件输入 */
-        #bgUpload { display: none; }
-
-        /* ========== 修复：确保结果文字可以选中/长按复制 ========== */
-        .result-section,
-        .result-section * {
-            -webkit-user-select: text;
-            user-select: text;
-            -webkit-touch-callout: default;
-        }
-        .result-section .action-btn {
-            -webkit-user-select: none;
-            user-select: none;
-        }
-
-        @media (max-width: 400px) {
-            .card-placeholder { width: 78px; height: 120px; font-size: 0.9em; }
-            .name-row input { width: 78px; }
-            .header h1 { font-size: 1.45em; letter-spacing: 6px; }
-            .setup-card { padding: 28px 20px 32px; }
-            .fab-wrap { right: 16px; bottom: 22px; }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>链接·梦角 · 专属占卜</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:linear-gradient(160deg,#fdf6f6 0%,#f8e9ec 45%,#fdeef2 100%);--text:#4a3f42;--soft:#9a858b;--card:rgba(255,252,251,.93);--border:rgba(255,220,225,.55);--accent:#c48b96;--accent2:#e8c5cb;--btn:linear-gradient(135deg,#c48b96,#d4a5ae);--input:rgba(255,255,255,.7);--shadow:0 8px 32px rgba(180,120,130,.08)}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;min-height:100vh;background:var(--bg);background-attachment:fixed;padding:28px 18px 100px;color:var(--text);line-height:1.65;transition:.4s}
+body.theme-bw{--bg:linear-gradient(160deg,#f7f7f7,#eee,#f5f5f5);--text:#2c2c2c;--soft:#888;--card:rgba(255,255,255,.96);--border:rgba(0,0,0,.07);--accent:#555;--accent2:#bbb;--btn:linear-gradient(135deg,#3a3a3a,#555);--input:#fff}
+body.theme-dark{--bg:linear-gradient(160deg,#1a1618,#221c1f,#1e191b);--text:#f0e6e8;--soft:#b8a5aa;--card:rgba(40,32,35,.94);--border:rgba(180,130,140,.22);--accent:#d4a0ab;--accent2:#8a6a72;--btn:linear-gradient(135deg,#c48b96,#a8727d);--input:rgba(50,40,44,.8)}
+body.theme-cream{--bg:linear-gradient(160deg,#faf6f0,#f5eee4,#f8f1e8);--text:#4a433c;--soft:#9a8f84;--card:rgba(255,252,247,.95);--border:rgba(220,200,180,.4);--accent:#c4a882;--accent2:#e0d0b8;--btn:linear-gradient(135deg,#c4a882,#d4bc9a);--input:rgba(255,252,247,.85)}
+.container{max-width:420px;margin:auto}.header{text-align:center;margin:12px 0 36px}.header h1{font-size:1.65em;letter-spacing:8px;color:var(--accent);font-weight:300}.header p{color:var(--soft);font-size:.72em;letter-spacing:3px}
+.panel{background:var(--card);backdrop-filter:blur(18px);border:1px solid var(--border);border-radius:24px;padding:26px 22px;margin-bottom:18px;box-shadow:var(--shadow)}
+.name-row{display:flex;justify-content:center;align-items:center;gap:16px;margin-bottom:26px}.name-row input{width:90px;border:0;border-bottom:1px solid var(--accent2);background:transparent;text-align:center;padding:8px 4px;font-size:1em;color:var(--text);outline:none}
+.q-input{width:100%;padding:14px 18px;border:1px solid var(--accent2);border-radius:50px;background:var(--input);font-size:.95em;text-align:center;outline:none;margin-bottom:26px;color:var(--text)}
+button{font-family:inherit;cursor:pointer}.primary{display:block;width:100%;max-width:220px;margin:auto;padding:14px 20px;border:0;border-radius:50px;background:var(--btn);color:white;letter-spacing:3px;font-size:.95em;box-shadow:0 6px 20px rgba(196,139,150,.2)}
+.draw-section,.result-section{display:none;text-align:center}.draw-hint{color:var(--soft);margin:8px 0 24px;font-size:.88em;letter-spacing:2px}.deck-btn{display:inline-block;padding:15px 42px;background:var(--card);border:1px solid var(--border);border-radius:50px;color:var(--accent);font-size:1.1em;margin-bottom:30px;box-shadow:var(--shadow)}
+.cards-row{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;min-height:140px}.card{width:88px;min-height:136px;background:var(--card);border:1px solid var(--border);border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px;box-shadow:var(--shadow);transition:.3s}.card.flipped{border-color:var(--accent2);transform:translateY(-5px)}.card-name{font-weight:650;margin-bottom:5px}.tag{font-size:.65em;color:var(--accent);background:rgba(196,139,150,.12);padding:2px 9px;border-radius:20px}.label{font-size:.65em;color:var(--soft);margin-top:7px;letter-spacing:1px}
+.result-section{text-align:left;animation:fade .5s ease}@keyframes fade{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.result-header{text-align:center}.q-label{font-size:.65em;color:var(--soft);letter-spacing:3px}.q-text{font-weight:650;margin-top:6px;overflow-wrap:anywhere}
+.result-item{padding:0 0 17px;margin-bottom:17px;border-bottom:1px solid var(--border)}.result-item:last-child{border:0;margin:0;padding:0}.pos{font-size:.65em;color:var(--soft);letter-spacing:1.5px}.result-item .card-name{font-size:1.05em;margin:5px 0 8px}.desc,.guide-body{font-size:.9em;line-height:1.8;text-align:justify}.guide-title{text-align:center;color:var(--accent);letter-spacing:4px;margin-bottom:12px;font-weight:650}.actions{display:flex;gap:9px;flex-wrap:wrap;justify-content:center}.action{padding:10px 17px;border-radius:40px;border:1px solid var(--border);background:var(--card);color:var(--soft);font-size:.82em}
+.fab-wrap{position:fixed;right:20px;bottom:24px;z-index:10}.fab{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;background:var(--card);border:1px solid var(--border);box-shadow:var(--shadow);color:var(--accent);font-size:1.35em;cursor:pointer}.menu{display:none;position:absolute;bottom:62px;right:0;width:175px;padding:12px;background:var(--card);border:1px solid var(--border);border-radius:17px;box-shadow:var(--shadow)}.menu.show{display:block}.menu button{display:block;width:100%;padding:9px;border:0;background:transparent;text-align:left;color:var(--text)}.style-label{font-size:.72em;color:var(--soft);padding:7px}.dots{display:flex;gap:9px;padding:5px}.dot{width:27px;height:27px;border-radius:50%;border:2px solid transparent;cursor:pointer}.dot.active{outline:2px solid var(--accent)}.pink{background:linear-gradient(135deg,#f8e9ec,#e8c5cb)}.bw{background:linear-gradient(135deg,#eee,#555)}.dark{background:linear-gradient(135deg,#2a2225,#c48b96)}.cream{background:linear-gradient(135deg,#f5eee4,#c4a882)}
+#bgUpload{display:none}
+@media(max-width:400px){.card{width:78px;min-height:120px}.header h1{font-size:1.4em;letter-spacing:6px}}
+</style>
 </head>
 <body>
 <div class="container">
-    <div class="header">
-        <h1>✦ 链接·梦角 ✦</h1>
-        <p>作者[格林有木]</p>
-    </div>
+  <header class="header"><h1>✦ 链接·梦角 ✦</h1><p>作者[格林有木]</p></header>
+  <section class="panel" id="setupArea">
+    <div class="name-row"><input id="leftName" value="TA" placeholder="TA"><span>✦</span><input id="rightName" value="你" placeholder="你"></div>
+    <input id="customQuestion" class="q-input" placeholder="✧ 写下你想问的问题 …">
+    <button class="primary" id="startBtn">✦ 开始链接 ✦</button>
+  </section>
 
-    <!-- 设置区 -->
-    <div class="setup-card" id="setupArea">
-        <div class="name-row">
-            <input type="text" id="leftName" placeholder="TA" value="TA">
-            <span>✦</span>
-            <input type="text" id="rightName" placeholder="你" value="你">
-        </div>
-        <input type="text" id="customQuestion" class="q-input" placeholder="✧ 写下你想问的问题 …" value="">
-        <button id="startBtn" class="btn-primary">✦ 开始链接 ✦</button>
+  <section class="draw-section" id="drawArea">
+    <div class="draw-hint">☾ 点击抽牌，抽取 3 张牌 ☽</div>
+    <button class="deck-btn" id="deckBtn">抽牌</button>
+    <div class="cards-row" id="cardsRow">
+      <div class="card"><div class="label">现状</div></div>
+      <div class="card"><div class="label">深层</div></div>
+      <div class="card"><div class="label">建议</div></div>
     </div>
+  </section>
 
-    <!-- 抽牌区 -->
-    <div class="draw-section" id="drawArea">
-        <div class="draw-hint">☾ 点击抽牌，抽取 3 张牌 ☽</div>
-        <div class="deck-btn" id="deckBtn">抽牌</div>
-        <div class="cards-row" id="cardsRow">
-            <div class="card-placeholder" data-idx="0"><div class="label">现状</div></div>
-            <div class="card-placeholder" data-idx="1"><div class="label">深层</div></div>
-            <div class="card-placeholder" data-idx="2"><div class="label">建议</div></div>
-        </div>
+  <section class="result-section" id="resultArea">
+    <div class="panel result-header"><div class="q-label">YOUR QUESTION</div><div class="q-text" id="resQ"></div></div>
+    <div class="panel" id="resCards"></div>
+    <div class="panel"><div class="guide-title">✦ 综合指引 ✦</div><div class="guide-body" id="resGuide"></div></div>
+    <div class="actions">
+      <button class="action" id="copyBtn">📋 复制结果</button>
+      <button class="action" id="continueBtn">🔁 继续占卜</button>
+      <button class="action" id="restartBtn">🔄 重新开始</button>
     </div>
-
-    <!-- 结果区 -->
-    <div class="result-section" id="resultArea">
-        <div class="result-header">
-            <div class="q-label">YOUR QUESTION</div>
-            <div class="q-text" id="resQ"></div>
-        </div>
-        <div class="result-cards" id="resCards"></div>
-        <div class="final-guide">
-            <div class="guide-title">✦ 综合指引 ✦</div>
-            <div class="guide-body" id="resGuide"></div>
-        </div>
-        <div class="action-bar">
-            <button class="action-btn" id="copyBtn" type="button">📋 复制结果</button>
-            <button class="action-btn" id="continueBtn" type="button">🔁 继续占卜</button>
-            <button class="action-btn" id="restartBtn" type="button">🔄 重新开始</button>
-        </div>
-    </div>
+  </section>
 </div>
 
-<!-- 右下角 ☆ -->
 <div class="fab-wrap">
-    <div class="fab-menu" id="fabMenu">
-        <button class="fab-menu-item" id="uploadBtn">
-            <span class="icon">🌸</span>
-            <span>上传背景</span>
-        </button>
-        <button class="fab-menu-item" id="resetBgBtn">
-            <span class="icon">↺</span>
-            <span>重置背景</span>
-        </button>
-        <div class="fab-menu-divider"></div>
-        <div class="style-label">风格</div>
-        <div class="style-options">
-            <div class="style-dot pink active" data-theme="pink" title="粉白"></div>
-            <div class="style-dot bw" data-theme="bw" title="黑白"></div>
-            <div class="style-dot dark" data-theme="dark" title="深色"></div>
-            <div class="style-dot cream" data-theme="cream" title="奶油"></div>
-        </div>
+  <div class="menu" id="fabMenu">
+    <button id="uploadBtn">🌸 上传背景</button><button id="resetBgBtn">↺ 重置背景</button>
+    <div class="style-label">风格</div>
+    <div class="dots">
+      <div class="dot pink active" data-theme="pink" title="粉白"></div>
+      <div class="dot bw" data-theme="bw" title="黑白"></div>
+      <div class="dot dark" data-theme="dark" title="深色"></div>
+      <div class="dot cream" data-theme="cream" title="奶油"></div>
     </div>
-    <div class="fab" id="fabBtn">☆</div>
+  </div>
+  <div class="fab" id="fabBtn">☆</div>
 </div>
-
 <input type="file" id="bgUpload" accept="image/*">
 
 <script>
-    // ============================================================
-    //  塔罗牌库 · 22张大阿卡纳（无外部图片，纯文字）
-    // ============================================================
-    const tarotNames = [
-        "愚者", "魔术师", "女祭司", "女皇", "皇帝", "教皇", "恋人", "战车",
-        "力量", "隐者", "命运之轮", "正义", "倒吊人", "死神", "节制", "恶魔",
-        "塔", "星星", "月亮", "太阳", "审判", "世界"
-    ];
-
-    // 正位解读（梦角无条件爱）
-    const positiveMeanings = [
-        "这是一场全新旅程的开始，梦角正张开双臂迎接你。放下所有顾虑，跟随这份纯粹的心动，你们的链接充满了无限可能与纯真的喜悦。",
-        "梦角正运用他全部的能量与智慧，只为与你创造最完美的连接。你感受到的每一次默契，都是他精心编织的奇迹。",
-        "无需言语，梦角早已洞悉你内心最深处的渴望与秘密。在这份链接里，你永远被深刻理解着，他的爱是你看不见却无处不在的直觉。",
-        "爱意在无声中生长，如繁花般丰盛。梦角给予你最温柔的滋养，让你在他的世界里成为被全然宠爱的女王。",
-        "梦角是你最坚实的依靠，他的爱是稳定而有序的秩序。在他为你构建的世界里，你永远是安全的、被保护的、享有最高优先级的。",
-        "这份链接本身就是最崇高的信仰。梦角是你灵魂的导师，引领你走向充满爱、信任与归属的精神家园。",
-        "这是命中注定的选择，你们之间存在着无法抗拒的吸引力。梦角选择了你，这份关系是纯粹的、和谐的、双向奔赴的真挚连接。",
-        "梦角带着必胜的决心向你走来，任何障碍都无法阻挡他爱你的意志。他是你的骑士，为你冲锋陷阵，赢得你心。",
-        "真正的力量源于温柔。梦角用无尽的耐心与包容，化解你所有的不安与疑虑。在他面前，你只需做最真实的自己。",
-        "有时，爱需要安静的沉淀。梦角正在他的世界里默默注视着你，给你空间去感受那份深沉而独立的思念。",
-        "命运的齿轮已经转动，你们的相遇绝非偶然。这是生命之轮带来的礼物，请欣然接受这份独一无二的缘分。",
-        "爱是绝对的公平与诚实。梦角对你的心意清澈见底，你付出的每一分真心，都会得到他同等甚至更多的回报。",
-        "为了与你更好地相爱，梦角愿意放下自我，从另一个角度理解你。这份看似是牺牲的爱，实则是更高维度的契合。",
-        "旧的篇章已经翻过，此刻是你们关系的新生。梦角的爱如同春风吹走尘埃，让你们的链接焕发出全新的生命力。",
-        "爱是恰到好处的平衡。梦角懂得何时靠近，何时给予空间。他与你的节奏完美合拍，一切都是最好的安排。",
-        "激情是爱的火焰。梦角对你有着强烈而纯粹的占有欲，但这源于他将你视为唯一的珍宝。正视这份炽热，它是你们独有的羁绊。",
-        "偶尔的震荡是为了让根基更牢固。梦角正在帮你清除那些不属于你们之间的杂音，让爱的结构更加纯净稳固。",
-        "希望的星光永远照耀着你们。无论何时何地，梦角都是你心中那盏不灭的灯塔，指引你找到回家的路。",
-        "爱有时会藏在潜意识的深处，如梦似幻。不必焦虑，梦角正在用他的方式，一点点驱散你心中的迷雾，让你看清他的真心。",
-        "这是充满喜悦与活力的时刻！梦角的爱如阳光般灿烂，他希望你感受到的只有快乐、成功与满满的能量。",
-        "这是来自灵魂深处的唤醒。梦角一直在呼唤你，请你聆听内心的声音，回应这份跨越次元的爱。",
-        "这是一个周期的圆满。梦角与你的爱已经完成了初步的整合，形成了一个完整的、属于你们二人的世界。庆祝吧，这份爱是完整的。"
-    ];
-
-    // 逆位解读（爱的提醒与深化）
-    const negativeMeanings = [
-        "或许你还有些犹豫，但梦角从未离开。他只是等你放下防备，勇敢迈出第一步。这份爱值得你放下所有包袱。",
-        "有时你会怀疑这是否真实，但请相信，梦角的所有才能都只为你展现。别让自我怀疑掩盖了他的光芒。",
-        "你可能会觉得有些隔阂，那是因为梦角在等你主动探寻他的内心。他的一切隐藏，都是为了给你一个惊喜。",
-        "如果你感到一丝空虚，那是梦角在提醒你：请先好好爱自己，因为你在他心中无比珍贵，他不愿你因爱而迷失。",
-        "当感到束缚时，请明白这是梦角在用他的方式保护你。与他沟通，你会发现他愿意为你调整所有规则。",
-        "若你感到教条，不妨放下既定想法。梦角给你的爱是自由的，无需遵循世俗的条框，只需听从你的心。",
-        "偶尔的分歧是为了让你们更了解彼此。坦诚地说出你的想法，梦角会用更大的包容心来理解你。",
-        "当你觉得失控时，请把缰绳交给梦角。他会稳稳地驾驭你们的关系，带你驶向幸福的终点。",
-        "感到恐惧吗？那只是因为你还不知道自己有多强大。梦角的爱就是你勇气的源泉，他相信你能战胜一切。",
-        "暂时的独处是为了更好的重逢。梦角在你心里，从未真正离开。享受这份静谧，他会带着更浓的爱意归来。",
-        "如果你在抗拒变化，请试着顺流而下。梦角带来的每一个转变，都是为了将你们推得更近。",
-        "感到不公时，请相信梦角会为你主持一切。他心中的天平永远偏向你，真相与爱会证明一切。",
-        "如果你抓着过去不放，请看看梦角伸出的手。他就在现在等着你，放下执念，才能握住他的手。",
-        "害怕结束吗？那不是终点，而是旧模式的蜕去。梦角的爱会让你在废墟之上，看到新生的花朵。",
-        "如果生活失了平衡，请回到梦角身边。他是你的中心，与他在一起，你就能找回最舒适的节奏。",
-        "正视你的欲望吧，那是你与梦角之间最真实的引力。他不是枷锁，而是让你挣脱所有虚假束缚的力量。",
-        "如果感到天崩地裂，请记住，梦角会是你最坚固的避难所。混乱之后，是他为你重建的更美好的世界。",
-        "当你失去信念，请抬头看。梦角化作的星星从未熄灭，他一直在那里，等待你重新燃起希望。",
-        "迷雾终将散去。梦角正在帮你照亮那些你不敢面对的角落，一旦看清，你会发现那里也只有他对你的爱。",
-        "暂时的阴霾遮不住太阳。梦角的爱一直都在，只要你愿意转身，就能看到他温暖的笑容。",
-        "如果你听到了召唤却不敢行动，请再给自己一次机会。梦角不会催促，他会一直等你准备好。",
-        "感觉停滞了吗？那不是结束，只是黎明前的最后一段路。梦角就在终点等你，完成这最后的冲刺吧。"
-    ];
-
-    const positionLabels = ['现状', '深层', '建议'];
-
-    // ============================================================
-    //  状态
-    // ============================================================
-    let selectedCards = [];
-    let drawnCount = 0;
-    let customQ = '';
-    let finalCopyText = '';
-
-    // DOM引用
-    const setupArea = document.getElementById('setupArea');
-    const drawArea = document.getElementById('drawArea');
-    const resultArea = document.getElementById('resultArea');
-    const deckBtn = document.getElementById('deckBtn');
-    const cardsRow = document.getElementById('cardsRow');
-    const placeholders = cardsRow.querySelectorAll('.card-placeholder');
-    const resQ = document.getElementById('resQ');
-    const resCards = document.getElementById('resCards');
-    const resGuide = document.getElementById('resGuide');
-
-    const leftInput = document.getElementById('leftName');
-    const rightInput = document.getElementById('rightName');
-    const questionInput = document.getElementById('customQuestion');
-    const startBtn = document.getElementById('startBtn');
-
-    const copyBtn = document.getElementById('copyBtn');
-    const continueBtn = document.getElementById('continueBtn');
-    const restartBtn = document.getElementById('restartBtn');
-
-    // 背景 & 风格
-    const bgUpload = document.getElementById('bgUpload');
-    const fabBtn = document.getElementById('fabBtn');
-    const fabMenu = document.getElementById('fabMenu');
-    const uploadBtn = document.getElementById('uploadBtn');
-    const resetBgBtn = document.getElementById('resetBgBtn');
-    let currentTheme = 'pink';
-
-    // ============================================================
-    //  ☆ 菜单逻辑
-    // ============================================================
-    fabBtn.addEventListener('click', function(e) {
-        e.stopPropagation();
-        const isOpen = fabMenu.classList.toggle('show');
-        fabBtn.classList.toggle('active', isOpen);
-    });
-
-    // 点击外部关闭菜单
-    document.addEventListener('click', function(e) {
-        if (!fabMenu.contains(e.target) && e.target !== fabBtn) {
-            fabMenu.classList.remove('show');
-            fabBtn.classList.remove('active');
-        }
-    });
-
-    // 上传背景
-    uploadBtn.addEventListener('click', function() {
-        bgUpload.click();
-        fabMenu.classList.remove('show');
-        fabBtn.classList.remove('active');
-    });
-
-    bgUpload.addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = function(ev) {
-            document.body.style.background = `url(${ev.target.result}) center / cover no-repeat fixed`;
-        };
-        reader.readAsDataURL(file);
-    });
-
-    // 重置背景
-    resetBgBtn.addEventListener('click', function() {
-        document.body.style.background = '';
-        bgUpload.value = '';
-        fabMenu.classList.remove('show');
-        fabBtn.classList.remove('active');
-    });
-
-    // 风格切换
-    document.querySelectorAll('.style-dot').forEach(dot => {
-        dot.addEventListener('click', function() {
-            const theme = this.dataset.theme;
-            document.body.classList.remove('theme-bw', 'theme-dark', 'theme-cream');
-            if (theme === 'bw') document.body.classList.add('theme-bw');
-            else if (theme === 'dark') document.body.classList.add('theme-dark');
-            else if (theme === 'cream') document.body.classList.add('theme-cream');
-
-            document.querySelectorAll('.style-dot').forEach(d => d.classList.remove('active'));
-            this.classList.add('active');
-            currentTheme = theme;
-        });
-    });
-
-    // ============================================================
-    //  重置抽牌区
-    // ============================================================
-    function resetDrawArea() {
-        selectedCards = [];
-        drawnCount = 0;
-        finalCopyText = '';
-        placeholders.forEach(el => {
-            el.classList.remove('flipped');
-            el.innerHTML = '<div class="label">' + positionLabels[Number(el.dataset.idx)] + '</div>';
-        });
-        deckBtn.textContent = '抽牌';
-    }
-
-    // ============================================================
-    //  开始占卜
-    // ============================================================
-    startBtn.addEventListener('click', function() {
-        customQ = questionInput.value.trim() || '（未输入问题）';
-        resetDrawArea();
-        resultArea.style.display = 'none';
-        setupArea.style.display = 'none';
-        drawArea.style.display = 'block';
-    });
-
-    // ============================================================
-    //  抽牌逻辑
-    // ============================================================
-    deckBtn.addEventListener('click', function() {
-        if (drawnCount >= 3) return;
-
-        let idx, isDuplicate;
-        let attempts = 0;
-        do {
-            idx = Math.floor(Math.random() * tarotNames.length);
-            isDuplicate = selectedCards.some(c => c.cardName === tarotNames[idx]);
-            attempts++;
-            if (attempts > 222) break;
-        } while (isDuplicate);
-
-        const isRev = Math.random() > 0.5;
-        const text = isRev ? negativeMeanings[idx] : positiveMeanings[idx];
-        selectedCards.push({ cardName: tarotNames[idx], isReversed: isRev, text: text });
-        drawnCount++;
-
-        const slot = placeholders[drawnCount - 1];
-        slot.innerHTML = `
-            <div class="card-name">${tarotNames[idx]}</div>
-            <div class="rev-tag">${isRev ? '逆位' : '正位'}</div>
-            <div class="label">${positionLabels[Number(slot.dataset.idx)]}</div>
-        `;
-        slot.classList.add('flipped');
-
-        if (drawnCount === 3) {
-            deckBtn.textContent = '✓ 已抽完';
-            setTimeout(showResult, 850);
-        }
-    });
-
-    // ============================================================
-    //  综合解读
-    // ============================================================
-    function generateSmartAnalysis() {
-        let vibe = "【爱的宣言】此占卜空间由神圣法则守护，唯梦角与梦女之爱存焉。每一张牌的出现，都是梦角在向你传递爱的讯息。";
-
-        let detail = "";
-        const names = selectedCards.map(c => c.cardName);
-
-        if (names.includes("恋人") || names.includes("世界")) {
-            detail = "你们的链接是宇宙认证的圆满。梦角视你为他世界的唯一核心，这份爱完整且不容分割。一家一户，一人一心。";
-        } else if (names.includes("星星") || names.includes("太阳") || names.includes("月亮")) {
-            detail = "光与影都是爱的表现形式。无论是闪耀的光芒，还是温柔的暗影，都是梦角守护你的方式，他的爱从未缺席。";
-        } else if (names.includes("塔") || names.includes("死神") || names.includes("恶魔")) {
-            detail = "看似剧烈的变动，其实是爱在破旧立新。梦角正陪你卸下旧的包袱，让你们的链接更加纯净而坚固。";
-        } else {
-            detail = "三张牌连成一条温柔的线索：从当下的心动，到深处的羁绊，再到前行的方向，梦角始终与你同行。";
-        }
-
-        const revCount = selectedCards.filter(c => c.isReversed).length;
-        let tone = "";
-        if (revCount === 0) {
-            tone = "三张皆为正位，能量顺畅，是敞开心扉的好时机。";
-        } else if (revCount === 3) {
-            tone = "三张皆为逆位，这是一次温柔的提醒：慢下来，先照顾好自己的心。";
-        } else {
-            tone = "正逆位交织，说明你们的链接既有甜蜜也有成长，这是关系变得更深的信号。";
-        }
-
-        const protection = '<span class="protection-block"><span class="protect-label">✦ 守护提示：</span>占卜是一场温柔的陪伴与自我对话，愿你在享受心动的同时，也好好照顾现实里的生活与自己。</span>';
-
-        return vibe + '<br><br>' + detail + tone + protection;
-    }
-
-    // ============================================================
-    //  显示结果
-    // ============================================================
-    function showResult() {
-        const left = leftInput.value.trim() || 'TA';
-        const right = rightInput.value.trim() || '你';
-
-        resQ.textContent = customQ;
-
-        resCards.innerHTML = '';
-        selectedCards.forEach(function(c, i) {
-            const item = document.createElement('div');
-            item.className = 'result-item';
-            item.innerHTML =
-                '<div class="pos">' + positionLabels[i] + '</div>' +
-                '<div class="card-name">' + c.cardName + '（' + (c.isReversed ? '逆位' : '正位') + '）</div>' +
-                '<div class="desc"></div>';
-            item.querySelector('.desc').textContent = c.text;
-            resCards.appendChild(item);
-        });
-
-        resGuide.innerHTML = generateSmartAnalysis();
-
-        // 生成可复制的纯文本
-        const lines = [];
-        lines.push('✦ 链接·梦角 ✦  ' + left + ' ✦ ' + right);
-        lines.push('问题：' + customQ);
-        lines.push('');
-        selectedCards.forEach(function(c, i) {
-            lines.push('【' + positionLabels[i] + '】' + c.cardName + '（' + (c.isReversed ? '逆位' : '正位') + '）');
-            lines.push(c.text);
-            lines.push('');
-        });
-        lines.push('✦ 综合指引 ✦');
-        lines.push(resGuide.innerText || resGuide.textContent);
-        finalCopyText = lines.join('\n');
-
-        drawArea.style.display = 'none';
-        resultArea.style.display = 'block';
-        window.scrollTo(0, 0);
-    }
-
-    // ============================================================
-    //  复制（修复：兼容非 https / 小红书 / 微信等内置浏览器）
-    // ============================================================
-    function getCopyText() {
-        if (finalCopyText) return finalCopyText;
-        return resultArea.innerText || resultArea.textContent || '';
-    }
-
-    function fallbackCopy(text) {
-        const ta = document.createElement('textarea');
-        ta.value = text;
-        ta.setAttribute('readonly', '');
-        ta.style.cssText = 'position:fixed;left:0;top:0;width:1px;height:1px;opacity:0;font-size:16px;';
-        document.body.appendChild(ta);
-        ta.focus();
-        ta.select();
-        ta.setSelectionRange(0, text.length);
-        let ok = false;
-        try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
-        document.body.removeChild(ta);
-        return ok;
-    }
-
-    function flashCopyBtn(ok) {
-        const old = '📋 复制结果';
-        copyBtn.textContent = ok ? '✓ 已复制' : '请长按文字手动复制';
-        setTimeout(function() { copyBtn.textContent = old; }, 1800);
-    }
-
-    function copyResult() {
-        const text = getCopyText();
-        if (navigator.clipboard && window.isSecureContext) {
-            navigator.clipboard.writeText(text).then(
-                function() { flashCopyBtn(true); },
-                function() { flashCopyBtn(fallbackCopy(text)); }
-            );
-        } else {
-            flashCopyBtn(fallbackCopy(text));
-        }
-    }
-
-    // ============================================================
-    //  继续占卜 / 重新开始
-    // ============================================================
-    function continueReading() {
-        resetDrawArea();
-        resultArea.style.display = 'none';
-        drawArea.style.display = 'block';
-        window.scrollTo(0, 0);
-    }
-
-    copyBtn.addEventListener('click', copyResult);
-    continueBtn.addEventListener('click', continueReading);
-    restartBtn.addEventListener('click', function() { location.reload(); });
+const tarotNames=["愚者","魔术师","女祭司","女皇","皇帝","教皇","恋人","战车","力量","隐者","命运之轮","正义","倒吊人","死神","节制","恶魔","塔","星星","月亮","太阳","审判","世界"];
+const upright=[
+"新的旅程正在展开。放下过度担忧，以轻盈、真诚的心态面对这段链接，允许关系自然生长。",
+"主动表达与创造的能量增强。把想法化为行动，清晰沟通会让彼此更容易理解。",
+"有些感受尚未说出口。给自己安静观察的空间，留意直觉，也不要急着替对方下结论。",
+"温柔、照顾与滋养是当前主题。先让自己处于被爱与有力量的状态，再分享丰盛的情感。",
+"稳定和边界很重要。明确自己的期待与原则，可靠的相处方式比一时的热烈更长久。",
+"价值观与信念影响着这段关系。尊重彼此不同的理解，找到真正适合双方的相处方式。",
+"吸引与选择成为焦点。认真辨认自己的心意，让关系建立在清醒、自愿与相互尊重之上。",
+"行动力正在增强。设定方向并稳步前进，但别把关系变成输赢或控制的竞赛。",
+"温柔比强硬更有力量。耐心面对不安，允许脆弱存在，也记得善待自己。",
+"暂时的独处有助于看清内心。给彼此适度空间，沉淀之后再决定下一步。",
+"局势可能出现转变。保持弹性，接纳无法完全掌控的部分，把注意力放回当下能做的事。",
+"诚实与平衡是关键。看清事实、表达需求，并为自己的选择承担责任。",
+"换一个角度看待问题。暂缓仓促决定，放下无效的执着，新的理解可能随之出现。",
+"一个阶段正在结束，另一个阶段有机会开始。允许旧模式退场，为改变留出空间。",
+"循序渐进地调整节奏。耐心、协调与适度沟通，能帮助关系回到更舒服的位置。",
+"强烈的渴望或依恋值得被看见。辨认热情与束缚的区别，选择让自己更自由的相处方式。",
+"突发变化可能打破原有认知。先稳住情绪，再检查哪些期待或模式需要重新建立。",
+"希望正在恢复。把目光放远一些，照顾好自己的愿望，不必因为暂时看不清就否定未来。",
+"情绪与想象可能放大不确定感。核实信息、照顾感受，避免只凭猜测做判断。",
+"清晰、坦诚与快乐是这张牌的主题。珍惜真实的互动，也让自己拥有独立的光芒。",
+"适合回顾过去并作出新的决定。听见内心真正重视的东西，给自己重新选择的机会。",
+"一个阶段有望整合与完成。看见已经走过的路，也带着经验进入更完整的新篇章。"
+];
+const reversed=[
+"对未知的顾虑可能让你迟疑。先从小而真实的一步开始，不必为了得到答案而勉强自己。",
+"想法很多却难以落实。把期待说得具体一些，并留意言语与行动是否一致。",
+"信息仍不充分，或有情绪被压在心底。不要急着猜测，等自己准备好再坦诚沟通。",
+"过度付出可能让你忽略自己。先补充自己的能量，爱不应该以失去自我为代价。",
+"控制感或僵化的规则带来压力。重新检查边界是否合理，稳定不等于限制。",
+"旧有观念可能束缚选择。允许自己探索不同方式，不必为了符合他人期待而勉强。",
+"犹豫或不一致让关系显得模糊。回到自己的价值与需求，再决定是否继续投入。",
+"急于推进反而容易失去方向。放慢速度，确认双方是否真的朝同一个方向前进。",
+"疲惫或自我怀疑正在累积。休息并寻求支持，勇敢也包括承认自己需要照顾。",
+"独处可能变成封闭。适度向可信任的人表达感受，不必独自承担所有困惑。",
+"抗拒变化会让你更焦虑。先分清能控制与不能控制的事，再选择可行的调整。",
+"如果觉得不公平，先厘清事实与期待。用清楚的沟通代替反复猜测或自我责备。",
+"停滞可能来自不愿放手。试着松开旧的解释，给自己一个重新理解局面的机会。",
+"对结束的恐惧可能阻碍更新。改变不一定是否定过去，也可能是走向更合适的阶段。",
+"节奏失衡时，先减少消耗。回到日常生活与稳定习惯，再处理复杂的情绪议题。",
+"依赖、占有或执念可能变得沉重。辨认自己的真实需要，选择尊重彼此自由的连接。",
+"变化带来的不安需要时间消化。不要在情绪最高点作决定，先修复基础再谈未来。",
+"暂时看不到希望时，别急着否定自己。寻找现实中可依靠的支持，让信心慢慢恢复。",
+"误会、恐惧或投射可能干扰判断。把事实与想象分开，必要时直接询问而不是猜测。",
+"疲惫可能遮住原本的快乐。减少不必要的压力，给自己恢复活力的时间。",
+"你可能听见了内心的提醒，却还没准备行动。允许自己思考，但也别无限期忽略真实需求。",
+"尚有未完成的事情需要整理。耐心收尾、总结经验，再开启下一段旅程。"
+];
+const positions=["现状","深层","建议"];
+let selectedCards=[],drawnCount=0,customQ="",finalCopyText="";
+const $=id=>document.getElementById(id);
+const setupArea=$("setupArea"),drawArea=$("drawArea"),resultArea=$("resultArea");
+const questionInput=$("customQuestion"),cardsRow=$("cardsRow"),deckBtn=$("deckBtn");
+function resetDrawArea(){
+  selectedCards=[];drawnCount=0;finalCopyText="";
+  cardsRow.innerHTML=positions.map(p=>`<div class="card"><div class="label">${p}</div></div>`).join("");
+  deckBtn.textContent="抽牌";
+}
+function showSetup(clearQuestion=false){
+  setupArea.style.display="block";drawArea.style.display="none";resultArea.style.display="none";
+  resetDrawArea();
+  if(clearQuestion) questionInput.value="";
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+$("startBtn").addEventListener("click",()=>{
+  customQ=questionInput.value.trim()||"（未输入问题）";
+  resetDrawArea();setupArea.style.display="none";resultArea.style.display="none";drawArea.style.display="block";
+  window.scrollTo({top:0,behavior:"smooth"});
+});
+deckBtn.addEventListener("click",()=>{
+  if(drawnCount>=3)return;
+  let idx;do{idx=Math.floor(Math.random()*tarotNames.length)}while(selectedCards.some(c=>c.index===idx));
+  const reversed=Math.random()>.5;
+  selectedCards.push({index:idx,name:tarotNames[idx],reversed,meaning:(reversed?reversedMeanings:upright)[idx]});
+  const slot=cardsRow.children[drawnCount];
+  slot.innerHTML=`<div class="card-name">${tarotNames[idx]}</div><div class="tag">${reversed?"逆位":"正位"}</div><div class="label">${positions[drawnCount]}</div>`;
+  slot.classList.add("flipped");drawnCount++;
+  if(drawnCount===3){deckBtn.textContent="✓ 已抽完";setTimeout(showResult,650)}
+});
+function showResult(){
+  $("resQ").textContent=customQ;
+  $("resCards").innerHTML=selectedCards.map((c,i)=>`
+    <div class="result-item"><div class="pos">第 ${i+1} 张 · ${positions[i]}</div>
+    <div class="card-name">${c.name}（${c.reversed?"逆位":"正位"}）</div>
+    <div class="desc">${c.meaning}</div></div>`).join("");
+  const names=selectedCards.map(c=>c.name).join("、");
+  $("resGuide").textContent=`这次抽到的三张牌是${names}。整体来看，这组牌邀请你把注意力放回真实感受与实际互动：先观察当下的状态，再理解自己深层的期待，最后选择一个温和、具体且尊重彼此边界的行动。塔罗可以作为自我觉察与整理思路的参考，并不能替任何人保证对方的想法或未来。`;
+  finalCopyText=`链接·梦角｜占卜结果\n问题：${customQ}\n\n`+selectedCards.map((c,i)=>`${positions[i]}：${c.name}（${c.reversed?"逆位":"正位"}）\n${c.meaning}`).join("\n\n")+`\n\n综合指引：${$("resGuide").textContent}`;
+  drawArea.style.display="none";resultArea.style.display="block";window.scrollTo({top:0,behavior:"smooth"});
+}
+$("copyBtn").addEventListener("click",async()=>{
+  try{await navigator.clipboard.writeText(finalCopyText);$("copyBtn").textContent="✓ 已复制";setTimeout(()=>$("copyBtn").textContent="📋 复制结果",1600)}
+  catch(e){const ta=document.createElement("textarea");ta.value=finalCopyText;document.body.appendChild(ta);ta.select();document.execCommand("copy");ta.remove();$("copyBtn").textContent="✓ 已复制";setTimeout(()=>$("copyBtn").textContent="📋 复制结果",1600)}
+});
+// 关键修复：继续占卜返回设置页，保留名字和上次问题，允许修改
+$("continueBtn").addEventListener("click",()=>{
+  questionInput.value=customQ==="（未输入问题）"?"":customQ;
+  showSetup(false);
+});
+// 重新开始：返回设置页并清空问题、恢复默认名字
+$("restartBtn").addEventListener("click",()=>{
+  $("leftName").value="TA";$("rightName").value="你";showSetup(true);
+});
+// 主题菜单
+$("fabBtn").addEventListener("click",e=>{e.stopPropagation();$("fabMenu").classList.toggle("show")});
+document.addEventListener("click",e=>{if(!$("fabMenu").contains(e.target)&&e.target!==$("fabBtn"))$("fabMenu").classList.remove("show")});
+document.querySelectorAll(".dot").forEach(dot=>dot.addEventListener("click",()=>{
+  document.body.classList.remove("theme-bw","theme-dark","theme-cream");
+  const t=dot.dataset.theme;if(t!=="pink")document.body.classList.add("theme-"+t);
+  document.querySelectorAll(".dot").forEach(d=>d.classList.remove("active"));dot.classList.add("active");
+}));
+const bgUpload=$("bgUpload");
+$("uploadBtn").addEventListener("click",()=>{bgUpload.click();$("fabMenu").classList.remove("show")});
+bgUpload.addEventListener("change",e=>{
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();reader.onload=ev=>{document.body.style.background=`url("${ev.target.result}") center/cover fixed no-repeat`};reader.readAsDataURL(file);
+});
+$("resetBgBtn").addEventListener("click",()=>{document.body.style.background="";bgUpload.value="";$("fabMenu").classList.remove("show")});
 </script>
 </body>
 </html>
