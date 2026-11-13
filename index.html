@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>链接·梦角 · 专属占卜</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=ZCOOL+KuaiLe&family=ZCOOL+XiaoWei&family=Long+Cang&family=Noto+Serif+SC:wght@400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DotGothic16&family=Ma+Shan+Zheng&family=ZCOOL+KuaiLe&family=ZCOOL+XiaoWei&family=ZCOOL+QingKe+HuangYou&family=Long+Cang&family=Zhi+Mang+Xing&family=Liu+Jian+Mao+Cao&family=Mochiy+Pop+One&family=Yusei+Magic&family=Noto+Serif+SC:wght@400;600;700&display=swap');
 *{margin:0;padding:0;box-sizing:border-box}
 html{font-size:var(--base-font-size)}
 body,body *{font-family:var(--font-family)!important}
@@ -19,6 +19,8 @@ body{color:var(--body-color)}
 .header p,.q-label,.pos,.label,.desc,.guide-body,.q-text{color:var(--body-color)}
 .primary{background:var(--primary-btn-bg)!important;color:var(--primary-btn-text)!important}
 .action{background:var(--action-btn-bg)!important;color:var(--action-btn-text)!important}
+.name-row input,.q-input{color:var(--input-text-color)!important}
+.name-row input::placeholder,.q-input::placeholder{color:var(--input-text-color);opacity:.5}
 :root{
   --bg:linear-gradient(160deg,#fdf6f6 0%,#f8e9ec 45%,#fdeef2 100%);
   --text:#4a3f42;--soft:#9a858b;--card:rgba(255,252,251,.93);
@@ -29,7 +31,7 @@ body{color:var(--body-color)}
   --font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
   --base-font-size:16px;--heading-font-size:26px;--body-font-size:16px;
   --heading-color:#c48b96;--body-color:#4a3f42;--primary-btn-bg:#c48b96;--primary-btn-text:#ffffff;
-  --action-btn-bg:#ffffff;--action-btn-text:#9a858b;
+  --action-btn-bg:#ffffff;--action-btn-text:#9a858b;--input-text-color:#4a3f42;
   --accent-rgb:196,139,150;
 }
 body{
@@ -98,6 +100,18 @@ button{font-family:inherit;cursor:pointer}
 .customize-item input[type=range]{width:100%;accent-color:var(--accent);cursor:pointer}
 .opacity-value{color:var(--accent);font-size:.75em;float:right}
 .reset-custom{width:100%;padding:9px;margin-top:8px;border:1px solid var(--border);border-radius:20px;color:var(--soft);background:var(--input);cursor:pointer;font-family:inherit;text-align:center!important}
+.menu-row{display:flex;gap:6px}
+.menu-row button{flex:1;width:auto;text-align:center;border:1px solid var(--border);font-size:calc(var(--body-font-size) * .85)}
+.sec{border-top:1px solid var(--border);margin-top:10px;padding-top:8px}
+.sec summary{cursor:pointer;color:var(--accent);font-size:.85em;letter-spacing:2px;padding:4px 2px;list-style:none}
+.sec summary::-webkit-details-marker{display:none}
+.sec summary::after{content:"＋";float:right;opacity:.7}
+.sec[open] summary::after{content:"－"}
+.sec .customize-item{margin:8px 0}
+.color-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px 10px;margin-top:6px}
+.color-grid .customize-item{margin:0}
+.hint{font-size:.7em;color:var(--soft);margin-top:8px;line-height:1.5}
+.menu .customize-item label,.menu .hint{font-size:.75rem}
 #bgUpload{display:none}
 @media(max-width:400px){.card{width:78px;min-height:120px}.header h1{letter-spacing:6px}}
 </style>
@@ -135,9 +149,11 @@ button{font-family:inherit;cursor:pointer}
 
 <div class="fab-wrap">
   <div class="menu" id="fabMenu">
-    <button id="uploadBtn">🌸 上传背景</button>
-    <button id="resetBgBtn">↺ 重置背景</button>
-    <div class="style-label">风格</div>
+    <div class="menu-row">
+      <button id="uploadBtn">🌸 上传背景</button>
+      <button id="resetBgBtn">↺ 重置背景</button>
+    </div>
+    <div class="style-label">配色风格</div>
     <div class="dots">
       <div class="dot pink active" data-theme="pink" title="粉白"></div>
       <div class="dot bw" data-theme="bw" title="黑白"></div>
@@ -145,76 +161,81 @@ button{font-family:inherit;cursor:pointer}
       <div class="dot cream" data-theme="cream" title="奶油"></div>
     </div>
 
-    <div class="customize">
-      <div class="customize-title">✧ 个性化美化 ✧</div>
+    <details class="sec" open>
+      <summary>✧ 字体与字号</summary>
       <div class="customize-item">
-        <label for="fontSelect">全局字体（标题、题干、正文和按钮同步改变）</label>
+        <label for="fontSelect">全局字体</label>
         <select id="fontSelect">
           <option value='system'>系统默认</option>
+          <option value='pixel'>像素游戏 · 复古像素</option>
           <option value='wenkai'>霞鹜文楷 · 温柔手写</option>
           <option value='ma'>马善政毛笔体 · 古典手写</option>
           <option value='longcang'>龙藏体 · 轻盈手写</option>
+          <option value='zhimang'>追风手写 · 飘逸行书</option>
+          <option value='liujian'>拾肆手写 · 潇洒草书</option>
+          <option value='diary'>手写日记 · 马克笔手写</option>
           <option value='kuaile'>站酷快乐体 · 圆润可爱</option>
+          <option value='candy'>软糖体 · 圆胖可爱</option>
+          <option value='huangyou'>显眼包 · 粗黑醒目</option>
           <option value='xiaowei'>站酷小薇体 · 文艺复古</option>
           <option value='serif'>思源宋体 · 优雅衬线</option>
+          <option value='blacksong'>黑宋体 · 粗宋醒目</option>
           <option value='sans'>思源黑体 · 清晰简洁</option>
           <option value='mono'>等宽打字机</option>
         </select>
       </div>
       <div class="customize-item">
-        <label for="headingSize">标题 / 题干字号 <span class="opacity-value" id="headingSizeValue">26px</span></label>
+        <label for="headingSize">标题字号 <span class="opacity-value" id="headingSizeValue">26px</span></label>
         <input type="range" id="headingSize" min="18" max="36" value="26" step="1">
       </div>
       <div class="customize-item">
-        <label for="bodySize">正文 / 说明字号 <span class="opacity-value" id="bodySizeValue">16px</span></label>
+        <label for="bodySize">正文字号 <span class="opacity-value" id="bodySizeValue">16px</span></label>
         <input type="range" id="bodySize" min="12" max="24" value="16" step="1">
       </div>
-      <div class="customize-item">
-        <label for="themeColor">装饰主题色（标签、边框、卡牌装饰）</label>
-        <input type="color" id="themeColor" value="#c48b96">
+    </details>
+
+    <details class="sec">
+      <summary>✧ 文字颜色</summary>
+      <div class="color-grid">
+        <div class="customize-item"><label for="headingColor">标题</label><input type="color" id="headingColor" value="#c48b96"></div>
+        <div class="customize-item"><label for="bodyColor">正文</label><input type="color" id="bodyColor" value="#4a3f42"></div>
+        <div class="customize-item"><label for="inputTextColor">输入框（TA / 你 / 问题）</label><input type="color" id="inputTextColor" value="#4a3f42"></div>
+        <div class="customize-item"><label for="themeColor">装饰主题色</label><input type="color" id="themeColor" value="#c48b96"></div>
       </div>
-      <div class="customize-item">
-        <label for="headingColor">标题颜色（页面标题、综合指引标题）</label>
-        <input type="color" id="headingColor" value="#c48b96">
+      <div class="hint">提示：改「正文」时，输入框颜色会同步；之后单独改输入框，就不再跟随。</div>
+    </details>
+
+    <details class="sec">
+      <summary>✧ 按钮颜色</summary>
+      <div class="color-grid">
+        <div class="customize-item"><label for="primaryBtnColor">开始链接 · 背景</label><input type="color" id="primaryBtnColor" value="#c48b96"></div>
+        <div class="customize-item"><label for="primaryBtnTextColor">开始链接 · 文字</label><input type="color" id="primaryBtnTextColor" value="#ffffff"></div>
+        <div class="customize-item"><label for="actionBtnColor">复制等按钮 · 背景</label><input type="color" id="actionBtnColor" value="#ffffff"></div>
+        <div class="customize-item"><label for="actionBtnTextColor">复制等按钮 · 文字</label><input type="color" id="actionBtnTextColor" value="#9a858b"></div>
       </div>
+    </details>
+
+    <details class="sec">
+      <summary>✧ 卡片样式</summary>
       <div class="customize-item">
-        <label for="bodyColor">正文颜色（题干、牌义、说明文字）</label>
-        <input type="color" id="bodyColor" value="#4a3f42">
-      </div>
-      <div class="customize-item">
-        <label for="primaryBtnColor">「开始链接」按钮背景色</label>
-        <input type="color" id="primaryBtnColor" value="#c48b96">
-      </div>
-      <div class="customize-item">
-        <label for="primaryBtnTextColor">「开始链接」按钮文字颜色</label>
-        <input type="color" id="primaryBtnTextColor" value="#ffffff">
-      </div>
-      <div class="customize-item">
-        <label for="actionBtnColor">复制 / 继续 / 重新开始按钮背景色</label>
-        <input type="color" id="actionBtnColor" value="#ffffff">
-      </div>
-      <div class="customize-item">
-        <label for="actionBtnTextColor">复制 / 继续 / 重新开始按钮文字颜色</label>
-        <input type="color" id="actionBtnTextColor" value="#9a858b">
-      </div>
-      <div class="customize-item">
-        <label for="panelColor">卡片 / 弹窗底色</label>
+        <label for="panelColor">卡片底色</label>
         <input type="color" id="panelColor" value="#fffcfb">
       </div>
       <div class="customize-item">
-        <label for="popupOpacity">卡片透明度 <span class="opacity-value" id="opacityValue">93%</span></label>
+        <label for="popupOpacity">透明度 <span class="opacity-value" id="opacityValue">93%</span></label>
         <input type="range" id="popupOpacity" min="10" max="100" value="93" step="1">
       </div>
       <div class="customize-item">
-        <label for="popupRadius">卡片圆角 <span class="opacity-value" id="radiusValue">24px</span></label>
+        <label for="popupRadius">圆角 <span class="opacity-value" id="radiusValue">24px</span></label>
         <input type="range" id="popupRadius" min="0" max="40" value="24" step="1">
       </div>
       <div class="customize-item">
-        <label for="popupBlur">背景模糊程度 <span class="opacity-value" id="blurValue">18px</span></label>
+        <label for="popupBlur">背景模糊 <span class="opacity-value" id="blurValue">18px</span></label>
         <input type="range" id="popupBlur" min="0" max="30" value="18" step="1">
       </div>
-      <button class="reset-custom" id="resetCustom">↺ 恢复默认美化</button>
-    </div>
+    </details>
+
+    <button class="reset-custom" id="resetCustom">↺ 恢复默认美化</button>
   </div>
   <div class="fab" id="fabBtn" aria-label="打开美化菜单">☆</div>
 </div>
@@ -359,19 +380,26 @@ document.querySelectorAll(".dot").forEach(dot=>dot.addEventListener("click",()=>
 // ☆ 自定义美化：全局字体 + 分区字号 + 统一主题色
 const fontSelect=$("fontSelect"),headingSize=$("headingSize"),bodySize=$("bodySize");
 const themeColor=$("themeColor"),panelColor=$("panelColor"),popupOpacity=$("popupOpacity");
-const headingColor=$("headingColor"),bodyColor=$("bodyColor");
+const headingColor=$("headingColor"),bodyColor=$("bodyColor"),inputTextColor=$("inputTextColor");
 const primaryBtnColor=$("primaryBtnColor"),primaryBtnTextColor=$("primaryBtnTextColor");
 const actionBtnColor=$("actionBtnColor"),actionBtnTextColor=$("actionBtnTextColor");
 const popupRadius=$("popupRadius"),popupBlur=$("popupBlur");
 
 const fontStacks={
   system:'-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif',
+  pixel:'"DotGothic16","Zpix","Fusion Pixel","Ark Pixel","PingFang SC","Microsoft YaHei",monospace',
   wenkai:'"LXGW WenKai","霞鹜文楷","KaiTi",serif',
   ma:'"Ma Shan Zheng","STKaiti","KaiTi",serif',
   longcang:'"Long Cang","KaiTi",cursive',
+  zhimang:'"Zhi Mang Xing","KaiTi",cursive',
+  liujian:'"Liu Jian Mao Cao","KaiTi",cursive',
+  diary:'"Yusei Magic","Long Cang","KaiTi",cursive',
   kuaile:'"ZCOOL KuaiLe","Microsoft YaHei",sans-serif',
+  candy:'"Mochiy Pop One","ZCOOL KuaiLe","Microsoft YaHei",sans-serif',
+  huangyou:'"ZCOOL QingKe HuangYou","Microsoft YaHei",sans-serif',
   xiaowei:'"ZCOOL XiaoWei","Songti SC",serif',
   serif:'"Noto Serif SC","Songti SC","SimSun",serif',
+  blacksong:'"Noto Serif SC","Songti SC","SimSun",serif',
   sans:'"Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif',
   mono:'"Courier New",monospace'
 };
@@ -381,6 +409,7 @@ function hexToRgb(hex){
 function updateCustom(){
   const root=document.documentElement;
   root.style.setProperty("--font-family",fontStacks[fontSelect.value]||fontStacks.system);
+  document.body.style.fontWeight=fontSelect.value==="blacksong"?"900":"";
   root.style.setProperty("--base-font-size",bodySize.value+"px");
   root.style.setProperty("--body-font-size",bodySize.value+"px");
   root.style.setProperty("--heading-font-size",headingSize.value+"px");
@@ -389,6 +418,7 @@ function updateCustom(){
   root.style.setProperty("--accent",c);
   root.style.setProperty("--heading-color",headingColor.value);
   root.style.setProperty("--body-color",bodyColor.value);
+  root.style.setProperty("--input-text-color",inputTextColor.value);
   root.style.setProperty("--primary-btn-bg",primaryBtnColor.value);
   root.style.setProperty("--primary-btn-text",primaryBtnTextColor.value);
   root.style.setProperty("--action-btn-bg",actionBtnColor.value);
@@ -408,19 +438,23 @@ function updateCustom(){
   $("radiusValue").textContent=popupRadius.value+"px";
   $("blurValue").textContent=popupBlur.value+"px";
 }
-[fontSelect,headingSize,bodySize,themeColor,headingColor,bodyColor,primaryBtnColor,primaryBtnTextColor,actionBtnColor,actionBtnTextColor,panelColor,popupOpacity,popupRadius,popupBlur]
+let inputColorTouched=false;
+inputTextColor.addEventListener("input",()=>{inputColorTouched=true});
+bodyColor.addEventListener("input",()=>{if(!inputColorTouched)inputTextColor.value=bodyColor.value});
+[fontSelect,headingSize,bodySize,themeColor,headingColor,bodyColor,inputTextColor,primaryBtnColor,primaryBtnTextColor,actionBtnColor,actionBtnTextColor,panelColor,popupOpacity,popupRadius,popupBlur]
   .forEach(el=>el.addEventListener("input",updateCustom));
 
 $("resetCustom").addEventListener("click",()=>{
   fontSelect.value="system";
   headingSize.value=26;bodySize.value=16;
-  themeColor.value="#c48b96";headingColor.value="#c48b96";bodyColor.value="#4a3f42";
+  themeColor.value="#c48b96";headingColor.value="#c48b96";bodyColor.value="#4a3f42";inputTextColor.value="#4a3f42";inputColorTouched=false;
   primaryBtnColor.value="#c48b96";primaryBtnTextColor.value="#ffffff";
   actionBtnColor.value="#ffffff";actionBtnTextColor.value="#9a858b";panelColor.value="#fffcfb";
   popupOpacity.value=93;popupRadius.value=24;popupBlur.value=18;
+  document.body.style.fontWeight="";
   ["--font-family","--base-font-size","--body-font-size","--heading-font-size",
    "--accent","--accent2","--soft","--btn","--border","--card","--input",
-   "--heading-color","--body-color","--primary-btn-bg","--primary-btn-text","--action-btn-bg","--action-btn-text",
+   "--heading-color","--body-color","--input-text-color","--primary-btn-bg","--primary-btn-text","--action-btn-bg","--action-btn-text",
    "--popup-radius","--popup-blur"].forEach(v=>document.documentElement.style.removeProperty(v));
   updateCustom();
 });
